@@ -12,7 +12,6 @@
 - (void)action:(CDVInvokedUrlCommand*)command;
 - (void)onEvent:(CDVInvokedUrlCommand*)command;
 - (void)sendMessage:(CDVInvokedUrlCommand*)command;
-- (void)onMqttMessage:(CDVInvokedUrlCommand*)command;
 
 @end
 
@@ -23,7 +22,6 @@
     CDVPluginResult* pluginResult = nil;
     NSDictionary *dict = command.arguments[0];
 
-//    NSString* echo = [command.arguments objectAtIndex:0];
     if ([dict isKindOfClass:[NSDictionary class]]) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@""];
     } else {
@@ -31,12 +29,16 @@
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         return;
     }
-    
-    NSString * page = dict[@"page"];
+
+    NSString *page = dict[@"url"];
+    NSArray *pluginList = dict[@"pluginList"];
+    NSString *actId = dict[@"actId"];
+//    NSString *callback_event = dict[@"callback_event"];
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
-//    MainViewController *rootViewController = (MainViewController *)window.rootViewController;
     MainWebController *viewController = [[MainWebController alloc] init];
     viewController.startPage = page;
+    viewController.command = self.commandDelegate;
+//    viewController.js_callback_event = callback_event;
     [(UINavigationController *)window.rootViewController pushViewController:viewController animated:YES];
 
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -53,22 +55,28 @@
 
 - (void)action:(CDVInvokedUrlCommand*)command
 {
-    
+
 }
 
 - (void)onEvent:(CDVInvokedUrlCommand*)command
 {
-    
+
 }
 
 - (void)sendMessage:(CDVInvokedUrlCommand*)command
 {
-    
-}
+    CDVPluginResult* pluginResult = nil;
+    NSDictionary *dict = command.arguments[0];
 
-- (void)onMqttMessage:(CDVInvokedUrlCommand*)command
-{
-    
+    if ([dict isKindOfClass:[NSDictionary class]]) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@""];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        return;
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"mqtt_action" object:dict];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 @end
