@@ -1,10 +1,3 @@
-//
-//  MainWebController.h
-//  TestDemo
-//
-//  Created by DoctorZhang on 2020/10/11.
-//
-
 #import <Cordova/CDVViewController.h>
 #import <Cordova/CDVCommandDelegateImpl.h>
 #import <Cordova/CDVCommandQueue.h>
@@ -14,7 +7,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MainWebController : CDVViewController
 @property (nonatomic, weak) id <CDVCommandDelegate> command;
-
+@property (nonatomic, copy) NSString *actId;
 @end
 
 @interface MainWebCommandDelegate : CDVCommandDelegateImpl

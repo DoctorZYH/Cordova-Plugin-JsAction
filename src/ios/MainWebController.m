@@ -1,11 +1,5 @@
-//
-//  MainWebController.m
-//  TestDemo
-//
-//  Created by DoctorZhang on 2020/10/11.
-//
-
 #import "MainWebController.h"
+#import "GlobalManager.h"
 
 @interface MainWebController ()<UIGestureRecognizerDelegate>
 
@@ -53,7 +47,7 @@
     // you can do so here.
 
     [super viewWillAppear:animated];
-    
+
 }
 
 - (void)viewDidLoad
@@ -68,7 +62,10 @@
 - (void)mqtt_action:(NSNotification *)notification
 {
     NSLog(@"mqtt_action");
-    [self callbackJSWith:@"JsAction.onMqttMessage" params:notification.object];
+
+    if ([GlobalManager defaultManager].actId == self.actId) {
+        [self callbackJSWith:@"JsAction.onMqttMessage" params:notification.object];
+    }
 }
 
 - (void)callbackJSWith:(NSString *)callback_event params:(NSDictionary *)params

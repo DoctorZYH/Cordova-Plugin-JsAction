@@ -2,6 +2,7 @@
 
 #import <Cordova/CDV.h>
 #import "MainWebController.h"
+#import "GlobalManager.h"
 
 @interface JsAction : CDVPlugin {
   // Member variables go here.
@@ -33,13 +34,17 @@
     NSString *page = dict[@"url"];
     NSArray *pluginList = dict[@"pluginList"];
     NSString *actId = dict[@"actId"];
-//    NSString *callback_event = dict[@"callback_event"];
+    [GlobalManager defaultManager].actId = actId;
+
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
+    UINavigationController *rootNavController = (UINavigationController *)window.rootViewController;
+
     MainWebController *viewController = [[MainWebController alloc] init];
+    viewController.actId = actId;
     viewController.startPage = page;
     viewController.command = self.commandDelegate;
-//    viewController.js_callback_event = callback_event;
-    [(UINavigationController *)window.rootViewController pushViewController:viewController animated:YES];
+
+    [rootNavController pushViewController:viewController animated:YES];
 
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
