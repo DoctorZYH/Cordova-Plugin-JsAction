@@ -28,6 +28,10 @@
 #import "MainViewController.h"
 #import "GlobalManager.h"
 
+@interface MainViewController ()<UIGestureRecognizerDelegate>
+
+@end
+
 @implementation MainViewController
 
 - (void)viewWillAppear:(BOOL)animated
