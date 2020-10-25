@@ -8,7 +8,7 @@ static GlobalManager *_globalManager = nil;
     if (_globalManager == nil) {
         
         _globalManager = [[GlobalManager alloc] init];
-        _globalManager.actId = @"main";
+        _globalManager.actIdArray = [NSMutableArray array];
     }
     return _globalManager;
 }
