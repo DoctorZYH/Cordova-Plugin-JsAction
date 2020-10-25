@@ -1,45 +1,34 @@
-#import "MainWebController.h"
+/*
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.  See the License for the
+ specific language governing permissions and limitations
+ under the License.
+ */
+
+//
+//  MainViewController.h
+//  Hello
+//
+//  Created by ___FULLUSERNAME___ on ___DATE___.
+//  Copyright ___ORGANIZATIONNAME___ ___YEAR___. All rights reserved.
+//
+
+#import "MainViewController.h"
 #import "GlobalManager.h"
 
-@interface MainWebController ()<UIGestureRecognizerDelegate>
-
-@end
-
-@implementation MainWebController
-
-- (id)initWithNibName:(NSString*)nibNameOrNil bundle:(NSBundle*)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Uncomment to override the CDVCommandDelegateImpl used
-        // _commandDelegate = [[MainCommandDelegate alloc] initWithViewController:self];
-        // Uncomment to override the CDVCommandQueue used
-        // _commandQueue = [[MainCommandQueue alloc] initWithViewController:self];
-    }
-    return self;
-}
-
-- (id)init
-{
-    self = [super init];
-    if (self) {
-        // Uncomment to override the CDVCommandDelegateImpl used
-        // _commandDelegate = [[MainCommandDelegate alloc] initWithViewController:self];
-        // Uncomment to override the CDVCommandQueue used
-        // _commandQueue = [[MainCommandQueue alloc] initWithViewController:self];
-    }
-    return self;
-}
-
-- (void)didReceiveMemoryWarning
-{
-    // Releases the view if it doesn't have a superview.
-    [super didReceiveMemoryWarning];
-
-    // Release any cached data, images, etc that aren't in use.
-}
-
-#pragma mark View lifecycle
+@implementation MainViewController
 
 - (void)viewWillAppear:(BOOL)animated
 {
@@ -82,7 +71,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationBecomeActive) name:UIApplicationWillEnterForegroundNotification object:nil];
     // 添加检测app进入后台的观察者
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationEnterBackground) name: UIApplicationDidEnterBackgroundNotification object:nil];
-
+    
     // Do any additional setup after loading the view from its nib.
 }
 
@@ -104,7 +93,7 @@
 
         [self callbackJSWith:@"JsAction.onEventDocument" params:onEventDict];
     }
-
+    
 }
 
 - (void)applicationEnterBackground
@@ -120,7 +109,7 @@
 - (void)mqtt_action:(NSNotification *)notification
 {
     NSLog(@"mqtt_action");
-
+    
     if ([GlobalManager defaultManager].actId == self.actId) {
         NSDictionary *onMqttMessageDict = @{@"type":notification.object[@"type"], @"data":[self jsonStringEncodedWith:notification.object[@"data"]]};
 
@@ -131,7 +120,7 @@
 - (void)onEvent:(NSNotification *)notification
 {
     NSLog(@"onEvent");
-
+    
     if ([GlobalManager defaultManager].actId == self.actId) {
         NSDictionary *onEventDict = @{@"type":notification.object[@"type"], @"data":[self arrayToJsonString:notification.object[@"data"]]};
 
@@ -163,12 +152,12 @@
     if (!params) {
         params = @{};
     }
-
+        
     NSMutableDictionary *dictM = [NSMutableDictionary dictionaryWithDictionary:params];
 //    NSString *paramStr = [self jsonStringEncodedWith:dictM[@"data"]];
     NSString *jsStr = [NSString stringWithFormat:@"%@(%@,%@)", callback_event, dictM[@"type"], dictM[@"data"]];
     NSLog(@"%@", jsStr);
-
+    
     [self.commandDelegate evalJs:jsStr];
 }
 
@@ -184,10 +173,10 @@
 }
 
 - (NSString *)arrayToJsonString:(NSArray *)array{
-
+    
     NSError *error = nil;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:array options:NSJSONWritingPrettyPrinted error:&error];
-
+    
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];;
 }
 
@@ -202,15 +191,16 @@
         }
     }
     [GlobalManager defaultManager].actIdArray = array;
-
+    
     NSDictionary *onEventDict = @{@"type":@"'close'", @"data":array};
     [[NSNotificationCenter defaultCenter] postNotificationName:@"onEvent" object:onEventDict];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+
 @end
 
-@implementation MainWebCommandDelegate
+@implementation MainCommandDelegate
 
 /* To override the methods, uncomment the line in the init function(s)
    in MainViewController.m
@@ -230,7 +220,7 @@
 
 @end
 
-@implementation MainWebCommandQueue
+@implementation MainCommandQueue
 
 /* To override, uncomment the line in the init function(s)
    in MainViewController.m
@@ -240,7 +230,4 @@
     return [super execute:command];
 }
 
-
 @end
-
-
