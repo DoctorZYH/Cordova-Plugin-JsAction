@@ -11,6 +11,7 @@
 }
 
 - (void)connectMQ:(CDVInvokedUrlCommand*)command;
+- (void)MQStatus:(CDVInvokedUrlCommand*)command;
 - (void)open:(CDVInvokedUrlCommand*)command;
 - (void)close:(CDVInvokedUrlCommand*)command;
 - (void)action:(CDVInvokedUrlCommand*)command;
@@ -33,6 +34,12 @@
         return;
     }
     [[MqttManager defaultManager] startMqttServiceWithConfig:dict];
+}
+
+- (void)MQStatus:(CDVInvokedUrlCommand*)command
+{
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsNSInteger:[MqttManager defaultManager].MQTTStatus];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)open:(CDVInvokedUrlCommand*)command

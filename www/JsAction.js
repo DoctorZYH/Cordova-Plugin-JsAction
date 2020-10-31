@@ -3,7 +3,9 @@ var exec = require('cordova/exec');
 exports.connectMQ = function (arg0, success, error) {
     exec(success, error, 'JsAction', 'connectMQ', [arg0]);
 };
-
+exports.MQStatus = function (arg0, success, error) {
+    exec(success, error, 'JsAction', 'MQStatus', [arg0]);
+};
 exports.open = function (arg0, success, error) {
     exec(success, error, 'JsAction', 'open', [arg0]);
 };
