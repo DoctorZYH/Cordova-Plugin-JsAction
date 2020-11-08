@@ -1,10 +1,3 @@
-//
-//  LocationManager.m
-//  Hello
-//
-//  Created by DoctorZhang on 2020/11/7.
-//
-
 #import "LocationManager.h"
 #import "DevicePermission.h"
 

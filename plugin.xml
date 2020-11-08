@@ -24,11 +24,15 @@
         <header-file src="src/ios/MainWebController.h"/>
         <header-file src="src/ios/GlobalManager.h"/>
         <header-file src="src/ios/MqttManager.h"/>
+        <header-file src="src/ios/DevicePermission.h"/>
+        <header-file src="src/ios/LocationManager.h"/>
 
         <source-file src="src/ios/JsAction.m"/>
+        <source-file src="src/ios/MainWebController.m"/>
         <source-file src="src/ios/GlobalManager.m"/>
         <source-file src="src/ios/MqttManager.m"/>
-        <source-file src="src/ios/MainWebController.m"/>
+        <source-file src="src/ios/DevicePermission.m"/>
+        <source-file src="src/ios/LocationManager.m"/>
 
         <pods-config ios-min-version="10.0" use-frameworks="true">
         </pods-config>
