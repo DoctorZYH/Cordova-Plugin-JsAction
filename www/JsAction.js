@@ -26,6 +26,7 @@ exports.onEvent = function (eventId, params) {
     });
 };
 
+
 exports.sendMessage = function (arg0, success, error) {
     exec(success, error, 'JsAction', 'sendMessage', [arg0]);
 };

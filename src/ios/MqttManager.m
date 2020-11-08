@@ -1,9 +1,13 @@
 #import "MqttManager.h"
+#import "Reachability.h"
 
 @interface MqttManager ()<MQTTSessionDelegate>
 @property (nonatomic, strong) MQTTSession           *session;
 @property (nonatomic, assign) BOOL                  didRegisterMQTTSection;
 @property (nonatomic, assign) BOOL                  isjustConnected;
+@property (nonatomic, strong) Reachability          *reachability;
+@property (nonatomic, assign) NSInteger             oldNetState;
+
 @end
 
 @implementation MqttManager
@@ -16,6 +20,8 @@ static MqttManager *_mqttManager = nil;
         
         _mqttManager = [[MqttManager alloc] init];
         _mqttManager.MQTTStatus = LCMQTTStatusConnecting;
+        [_mqttManager observeNetworkStatus];
+        _mqttManager.oldNetState = -1;
 //        _mqttManager.socketConfig = [[LCSocketConfig alloc] init];
     }
     return _mqttManager;
@@ -30,6 +36,18 @@ static MqttManager *_mqttManager = nil;
         
         _mqttManager = nil;
     }
+}
+
+- (void)observeNetworkStatus {
+    [MqttManager defaultManager].oldNetState = 1;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(reachabilityChanged:)
+                                                 name:kReachabilityChangedNotification
+                                               object:nil];
+    
+    [MqttManager defaultManager].reachability = [Reachability reachabilityWithHostname:@"www.google.com"];
+    [[MqttManager defaultManager].reachability startNotifier];
 }
 
 #pragma mark - Private Methods
@@ -152,9 +170,13 @@ static MqttManager *_mqttManager = nil;
 - (void)connected:(MQTTSession *)session {
     NSLog(@"connected --  %ld",session.status);
     self.MQTTStatus = LCMQTTStatusConnected;
+
+    if (_isjustConnected) {
+        NSDictionary *param = @{@"type":@(102), @"data":@{}};
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"mqtt_action" object:param];
+    }
     if (!_isjustConnected) {
         _isjustConnected = YES;
-        [self performSelector:@selector(changeIsjustConnectedToNo) withObject:nil afterDelay:15];
     }
 //    if (!LCINSTANCE_USER.didSubscribe) {
 //        [LCINSTANCE_SYNCMANAGER requestSubscribe];
@@ -195,9 +217,9 @@ static MqttManager *_mqttManager = nil;
     }];
 }
 
-- (void)changeIsjustConnectedToNo {
-    _isjustConnected = NO;
-}
+//- (void)changeIsjustConnectedToNo {
+//    _isjustConnected = NO;
+//}
 
 - (void)startMqttServiceWithConfig:(NSDictionary *)config {
     NSLog(@"startMqttServiceWithConfig: %@", config);
@@ -243,5 +265,32 @@ static MqttManager *_mqttManager = nil;
     NSLog(@"###socket: receivedSocketJson: %@", json);
     [[NSNotificationCenter defaultCenter] postNotificationName:@"mqtt_action" object:json];
 }
+
+
+-(void)reachabilityChanged:(NSNotification*)note
+{
+    Reachability * reach = [note object];
+    NetworkStatus netStatus = [reach currentReachabilityStatus];
+    if([MqttManager defaultManager].oldNetState == netStatus) {
+        return;
+    }
+    [MqttManager defaultManager].oldNetState = netStatus;
+    
+    if([reach isReachable])
+    {
+        NSString * temp = [NSString stringWithFormat:@"GOOGLE Notification Says Reachable(%@)", reach.currentReachabilityString];
+        NSLog(@"%@", temp);
+        if (_MQTTStatus == LCMQTTStatusDisconnect) {
+            [self reconnection];
+        }
+    }
+    else
+    {
+        NSString * temp = [NSString stringWithFormat:@"GOOGLE Notification Says Unreachable(%@)", reach.currentReachabilityString];
+        NSLog(@"%@", temp);
+    }
+    
+}
+
 
 @end

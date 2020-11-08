@@ -5,10 +5,12 @@
 #import "GlobalManager.h"
 #import "MqttManager.h"
 #import "DevicePermission.h"
+#import "LocationManager.h"
 
 @interface JsAction : CDVPlugin {
   // Member variables go here.
 }
+@property (nonatomic, strong) LocationManager *locationManager;
 
 - (void)connectMQ:(CDVInvokedUrlCommand*)command;
 - (void)MQStatus:(CDVInvokedUrlCommand*)command;
@@ -20,6 +22,10 @@
 @end
 
 @implementation JsAction
+
+- (void)dealloc {
+    NSLog(@"");
+}
 
 - (void)connectMQ:(CDVInvokedUrlCommand*)command
 {
@@ -34,6 +40,7 @@
         return;
     }
     [[MqttManager defaultManager] startMqttServiceWithConfig:dict];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)MQStatus:(CDVInvokedUrlCommand*)command
@@ -54,7 +61,7 @@
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         return;
     }
-
+    
     NSString *page = dict[@"url"];
     NSArray *pluginList = dict[@"pluginList"];
     NSString *actId = dict[@"actId"];
@@ -76,7 +83,7 @@
 //    [rootNavController pushViewController:viewController animated:YES];
 
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-
+    
 //    NSDictionary *onEventDict = @{@"type":@"'close'", @"data":[NSString stringWithFormat:@"'%@'", [array componentsJoinedByString:@","]]};
 
     NSDictionary *onEventDict = @{@"type":@"'open'", @"data":[GlobalManager defaultManager].actIdArray};
@@ -96,22 +103,27 @@
     }
     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@""];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-
+    
     NSString *actId = dict[@"actId"];
+
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
     UINavigationController *rootVC = (UINavigationController *)window.rootViewController;
     MainViewController *topVC = rootVC.viewControllers.lastObject;
-    if ([topVC.actId isEqualToString:actId]) {
-        [rootVC popViewControllerAnimated:YES];
+    if ([actId isEqualToString:@"all"]) {
+        [rootVC popToRootViewControllerAnimated:YES];
     }else {
-        NSMutableArray *naviVCsArr = [[NSMutableArray alloc]initWithArray:rootVC.viewControllers];
-        for (MainViewController *vc in naviVCsArr) {
-            if ([vc.actId isEqualToString:actId]) {
-                [naviVCsArr removeObject:vc];
-                break;
+        if ([topVC.actId isEqualToString:actId]) {
+            [rootVC popViewControllerAnimated:YES];
+        }else {
+            NSMutableArray *naviVCsArr = [[NSMutableArray alloc]initWithArray:rootVC.viewControllers];
+            for (MainViewController *vc in naviVCsArr) {
+                if ([vc.actId isEqualToString:actId]) {
+                    [naviVCsArr removeObject:vc];
+                    break;
+                }
             }
+            rootVC.viewControllers = naviVCsArr;
         }
-        rootVC.viewControllers = naviVCsArr;
     }
 }
 
@@ -130,23 +142,48 @@
     // 页面间通信
     if (action == 1) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"action_1" object:dict];
-    }else if (action == 102) {
-        [DevicePermission checkMicrophonePermissionWaitForRequestResult:NO complection:^(BOOL granted) {
-
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }else if (action == 101) {
+        [DevicePermission checkCameraPermission:^(BOOL granted) {
+            
             if (granted) {
-
+                
                 CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
                 [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
             } else {
-
+                
+                CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+                [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+            }
+        }];
+    }else if (action == 102) {
+        [DevicePermission checkMicrophonePermissionWaitForRequestResult:NO complection:^(BOOL granted) {
+            
+            if (granted) {
+                
+                CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+                [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+            } else {
+                
+                CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+                [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+            }
+        }];
+    }else if (action == 103) {
+        
+        self.locationManager = [[LocationManager alloc] init];
+        [self.locationManager checkLocationPermission:^(BOOL granted) {
+            if (granted) {
+                
+                CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+                [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+            } else {
+                
                 CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
                 [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
             }
         }];
     }
-    
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    
 }
 
 - (void)sendMessage:(CDVInvokedUrlCommand*)command
