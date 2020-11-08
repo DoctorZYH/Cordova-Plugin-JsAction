@@ -26,6 +26,7 @@
         <header-file src="src/ios/MqttManager.h"/>
         <header-file src="src/ios/DevicePermission.h"/>
         <header-file src="src/ios/LocationManager.h"/>
+        <header-file src="src/ios/Reachability.h"/>
 
         <source-file src="src/ios/JsAction.m"/>
         <source-file src="src/ios/MainViewController.m"/>
@@ -33,6 +34,7 @@
         <source-file src="src/ios/MqttManager.m"/>
         <source-file src="src/ios/DevicePermission.m"/>
         <source-file src="src/ios/LocationManager.m"/>
+        <source-file src="src/ios/Reachability.m"/>
 
         <pods-config ios-min-version="10.0" use-frameworks="true">
         </pods-config>
