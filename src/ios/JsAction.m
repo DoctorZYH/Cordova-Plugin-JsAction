@@ -18,6 +18,7 @@
 - (void)close:(CDVInvokedUrlCommand*)command;
 - (void)action:(CDVInvokedUrlCommand*)command;
 - (void)sendMessage:(CDVInvokedUrlCommand*)command;
+- (void)gesture:(CDVInvokedUrlCommand*)command;
 
 @end
 
@@ -65,6 +66,8 @@
     NSString *page = dict[@"url"];
     NSArray *pluginList = dict[@"pluginList"];
     NSString *actId = dict[@"actId"];
+    NSInteger isFullScreen = [dict[@"isFullScreen"] integerValue];
+
     if (actId == nil) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -77,6 +80,9 @@
     MainViewController *viewController = [[MainViewController alloc] init];
     viewController.actId = actId;
     viewController.startPage = page;
+    if (isFullScreen == 2) {
+        viewController.backgroundColor = [UIColor blackColor];
+    }
     viewController.command = self.commandDelegate;
     [(UINavigationController *)window.rootViewController pushViewController:viewController animated:YES];
 
@@ -125,6 +131,23 @@
             rootVC.viewControllers = naviVCsArr;
         }
     }
+}
+
+- (void)gesture:(CDVInvokedUrlCommand*)command
+{
+    CDVPluginResult* pluginResult = nil;
+    NSDictionary *dict = command.arguments[0];
+    if ([dict isKindOfClass:[NSDictionary class]]) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@""];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        return;
+    }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"gesture" object:dict];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+
 }
 
 - (void)action:(CDVInvokedUrlCommand*)command

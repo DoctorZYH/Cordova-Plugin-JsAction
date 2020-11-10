@@ -18,6 +18,10 @@ exports.action = function (arg0, success, error) {
     exec(success, error, 'JsAction', 'action', [arg0]);
 };
 
+exports.gesture = function (arg0, success, error) {
+    exec(success, error, 'JsAction', 'gesture', [arg0]);
+};
+
 // 全局
 exports.onEvent = function (eventId, params) {
     cordova.fireWindowEvent('JsAction.onEvent', {

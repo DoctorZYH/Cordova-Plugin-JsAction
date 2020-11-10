@@ -43,6 +43,7 @@
     [super viewWillAppear:animated];
     self.navigationController.navigationBarHidden = YES;
     self.navigationController.interactivePopGestureRecognizer.delegate = self;
+    self.navigationController.interactivePopGestureRecognizer.enabled = YES;
     [GlobalManager defaultManager].actId = self.actId;
 }
 
@@ -69,6 +70,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mqtt_action:) name:@"mqtt_action" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onEvent:) name:@"onEvent" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(action_1:) name:@"action_1" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(gestureChange:) name:@"gesture" object:nil];
 
     // app启动或者app从后台进入前台都会调用这个方法
 //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
@@ -88,6 +90,14 @@
     }
     [self action_3];
     return YES;
+}
+
+- (void)gestureChange:(NSNotification *)notification
+{
+    if ([GlobalManager defaultManager].actId == self.actId) {
+        BOOL type = [notification.object[@"type"] boolValue];
+        self.navigationController.interactivePopGestureRecognizer.enabled = type;
+    }
 }
 
 - (void)applicationBecomeActive
@@ -200,6 +210,7 @@
     NSDictionary *onEventDict = @{@"type":@"'close'", @"data":array};
     [[NSNotificationCenter defaultCenter] postNotificationName:@"onEvent" object:onEventDict];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    NSLog(@"---------------------------------------------------------------");
 }
 
 
