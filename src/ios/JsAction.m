@@ -6,6 +6,7 @@
 #import "MqttManager.h"
 #import "DevicePermission.h"
 #import "LocationManager.h"
+#import "WebController.h"
 
 @interface JsAction : CDVPlugin {
   // Member variables go here.
@@ -62,9 +63,8 @@
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         return;
     }
-    
+
     NSString *page = dict[@"url"];
-    NSArray *pluginList = dict[@"pluginList"];
     NSString *actId = dict[@"actId"];
     NSInteger isFullScreen = [dict[@"isFullScreen"] integerValue];
 
@@ -73,27 +73,33 @@
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         return;
     }
-    [[GlobalManager defaultManager].actIdArray addObject:actId];
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
-//    UINavigationController *rootNavController = (UINavigationController *)window.rootViewController;
+    // b-web 不带导航栏
+    // n-web 带导航栏
+    if ([actId isEqualToString:@"b-web"] || [actId isEqualToString:@"n-web"]) {
+        WebController *webVC = [[WebController alloc] init];
+        webVC.projectUrl = dict[@"url"];
+        webVC.needNav = [actId isEqualToString:@"n-web"];
+        [(UINavigationController *)window.rootViewController pushViewController:webVC animated:YES];
+//        [self.navigationController pushViewController:webVC animated:YES];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 
-    MainViewController *viewController = [[MainViewController alloc] init];
-    viewController.actId = actId;
-    viewController.startPage = page;
-    if (isFullScreen == 2) {
-        viewController.backgroundColor = [UIColor blackColor];
+    }else {
+        [[GlobalManager defaultManager].actIdArray addObject:actId];
+
+        MainViewController *viewController = [[MainViewController alloc] init];
+        viewController.actId = actId;
+        viewController.startPage = page;
+        if (isFullScreen == 2) {
+            viewController.backgroundColor = [UIColor blackColor];
+        }
+        viewController.command = self.commandDelegate;
+        [(UINavigationController *)window.rootViewController pushViewController:viewController animated:YES];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+
+        NSDictionary *onEventDict = @{@"type":@"'open'", @"data":[GlobalManager defaultManager].actIdArray};
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"onEvent" object:onEventDict];
     }
-    viewController.command = self.commandDelegate;
-    [(UINavigationController *)window.rootViewController pushViewController:viewController animated:YES];
-
-//    [rootNavController pushViewController:viewController animated:YES];
-
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    
-//    NSDictionary *onEventDict = @{@"type":@"'close'", @"data":[NSString stringWithFormat:@"'%@'", [array componentsJoinedByString:@","]]};
-
-    NSDictionary *onEventDict = @{@"type":@"'open'", @"data":[GlobalManager defaultManager].actIdArray};
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"onEvent" object:onEventDict];
 }
 
 - (void)close:(CDVInvokedUrlCommand*)command
@@ -109,7 +115,7 @@
     }
     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@""];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    
+
     NSString *actId = dict[@"actId"];
 
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
@@ -144,7 +150,7 @@
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         return;
     }
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"gesture" object:dict];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 
@@ -168,34 +174,46 @@
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }else if (action == 101) {
         [DevicePermission checkCameraPermission:^(BOOL granted) {
-            
+
             if (granted) {
-                
+
                 CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
                 [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
             } else {
-                
+
                 CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
                 [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
             }
         }];
     }else if (action == 102) {
         [DevicePermission checkMicrophonePermissionWaitForRequestResult:NO complection:^(BOOL granted) {
-            
+
             if (granted) {
-                
+
                 CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
                 [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
             } else {
-                
+
                 CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
                 [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
             }
         }];
     }else if (action == 103) {
-        
+
         self.locationManager = [[LocationManager alloc] init];
         [self.locationManager checkLocationPermission:^(BOOL granted) {
+            if (granted) {
+
+                CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+                [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+            } else {
+
+                CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+                [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+            }
+        }];
+    }else if (action == 104) {
+        [DevicePermission checkPhotoAlbumPermission:^(BOOL granted) {
             if (granted) {
                 
                 CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];

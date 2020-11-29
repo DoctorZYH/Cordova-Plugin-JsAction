@@ -27,6 +27,7 @@
         <header-file src="src/ios/DevicePermission.h"/>
         <header-file src="src/ios/LocationManager.h"/>
         <header-file src="src/ios/Reachability.h"/>
+        <header-file src="src/ios/WebController.h"/>
 
         <source-file src="src/ios/JsAction.m"/>
         <source-file src="src/ios/MainViewController.m"/>
@@ -35,6 +36,7 @@
         <source-file src="src/ios/DevicePermission.m"/>
         <source-file src="src/ios/LocationManager.m"/>
         <source-file src="src/ios/Reachability.m"/>
+        <source-file src="src/ios/WebController.m"/>
 
         <pods-config ios-min-version="10.0" use-frameworks="true">
         </pods-config>
