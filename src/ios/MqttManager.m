@@ -3,7 +3,7 @@
 
 @interface MqttManager ()<MQTTSessionDelegate>
 @property (nonatomic, strong) MQTTSession           *session;
-@property (nonatomic, assign) BOOL                  didRegisterMQTTSection;
+//@property (nonatomic, assign) BOOL                  didRegisterMQTTSection;
 @property (nonatomic, assign) BOOL                  isjustConnected;
 @property (nonatomic, strong) Reachability          *reachability;
 @property (nonatomic, assign) NSInteger             oldNetState;
@@ -225,23 +225,23 @@ static MqttManager *_mqttManager = nil;
     NSLog(@"startMqttServiceWithConfig: %@", config);
     NSLog(@"startMqttServiceWithConfig: %@", config[@"mqtt_port_tcp"]);
     if ([config[@"is_connect"] integerValue] == 1) {
-        if (!_didRegisterMQTTSection) {
-            if (config[@"mqtt_host"] && [config[@"mqtt_port_tcp"] intValue] > 0) {
-                MQTTCFSocketTransport *transport = [[MQTTCFSocketTransport alloc] init];
-                transport.host = config[@"mqtt_host"];
-                transport.port = [config[@"mqtt_port_tcp"] intValue];
-                _session = [[MQTTSession alloc] init];
-                _session.persistence.persistent = YES;
-                _session.transport = transport;
-                _session.delegate = self;
-                _session.cleanSessionFlag = NO;
-                _session.clientId = config[@"client_id"];
-                _session.userName = [NSString stringWithFormat:@"%@",config[@"username"]];
-                _session.password = config[@"password"];
-                _session.keepAliveInterval = 60;
-                
-                _didRegisterMQTTSection = YES;
-            }
+//        if (!_didRegisterMQTTSection) {
+        if (config[@"mqtt_host"] && [config[@"mqtt_port_tcp"] intValue] > 0) {
+            MQTTCFSocketTransport *transport = [[MQTTCFSocketTransport alloc] init];
+            transport.host = config[@"mqtt_host"];
+            transport.port = [config[@"mqtt_port_tcp"] intValue];
+            _session = [[MQTTSession alloc] init];
+            _session.persistence.persistent = YES;
+            _session.transport = transport;
+            _session.delegate = self;
+            _session.cleanSessionFlag = NO;
+            _session.clientId = config[@"client_id"];
+            _session.userName = [NSString stringWithFormat:@"%@",config[@"username"]];
+            _session.password = config[@"password"];
+            _session.keepAliveInterval = 60;
+            
+//            _didRegisterMQTTSection = YES;
+//            }
         }
         // 如果已经连上或正在连接中，return
         if (_session.status == MQTTSessionStatusConnected || _session.status == MQTTSessionStatusConnecting) {

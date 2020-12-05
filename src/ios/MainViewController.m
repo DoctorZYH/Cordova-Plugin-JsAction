@@ -44,12 +44,12 @@
     self.navigationController.navigationBarHidden = YES;
     self.navigationController.interactivePopGestureRecognizer.delegate = self;
     self.navigationController.interactivePopGestureRecognizer.enabled = YES;
-    [GlobalManager defaultManager].actId = self.actId;
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    [GlobalManager defaultManager].actId = self.actId;
 }
 
 - (void)viewWillDisappear:(BOOL)animated

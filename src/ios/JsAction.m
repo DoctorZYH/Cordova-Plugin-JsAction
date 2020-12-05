@@ -63,7 +63,7 @@
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         return;
     }
-
+    
     NSString *page = dict[@"url"];
     NSString *actId = dict[@"actId"];
     NSInteger isFullScreen = [dict[@"isFullScreen"] integerValue];
@@ -86,7 +86,7 @@
 
     }else {
         [[GlobalManager defaultManager].actIdArray addObject:actId];
-
+        
         MainViewController *viewController = [[MainViewController alloc] init];
         viewController.actId = actId;
         viewController.startPage = page;
@@ -115,7 +115,7 @@
     }
     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@""];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-
+    
     NSString *actId = dict[@"actId"];
 
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
@@ -150,7 +150,7 @@
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         return;
     }
-
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:@"gesture" object:dict];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 
@@ -174,40 +174,40 @@
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }else if (action == 101) {
         [DevicePermission checkCameraPermission:^(BOOL granted) {
-
+            
             if (granted) {
-
+                
                 CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
                 [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
             } else {
-
+                
                 CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
                 [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
             }
         }];
     }else if (action == 102) {
         [DevicePermission checkMicrophonePermissionWaitForRequestResult:NO complection:^(BOOL granted) {
-
+            
             if (granted) {
-
+                
                 CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
                 [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
             } else {
-
+                
                 CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
                 [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
             }
         }];
     }else if (action == 103) {
-
+        
         self.locationManager = [[LocationManager alloc] init];
         [self.locationManager checkLocationPermission:^(BOOL granted) {
             if (granted) {
-
+                
                 CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
                 [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
             } else {
-
+                
                 CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
                 [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
             }
